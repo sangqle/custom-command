@@ -1,8 +1,17 @@
 #!/bin/bash
+
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  open -a "Google Chrome.app" $1
+  if [[ "$1" == "gg" ]]; then
+    open -a "Google Chrome.app" "about:blank"
+  else
+    open -a "Google Chrome.app" "$1"
+  fi
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  chrome $1
+  if [[ "$1" == "newtab" ]]; then
+    google-chrome "about:blank"
+  else
+    google-chrome "$1"
+  fi
 else
   echo "Unsupported operating system: $OSTYPE"
   exit 1
