@@ -1,0 +1,9 @@
+#!/bin/bash
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  open -a "Google Chrome.app" $1
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  chrome $1
+else
+  echo "Unsupported operating system: $OSTYPE"
+  exit 1
+fi
