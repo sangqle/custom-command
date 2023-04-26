@@ -1,8 +1,7 @@
 # How to load your custom scripts
 
-Create dir to store your scripts
 ```bash
-mkdir ~/.custom-commnand
+git clone git@github.com:sangqle/custom-command.git ~/.custom-command
 ```
 
 Add this to your .bashrc or .zshrc
