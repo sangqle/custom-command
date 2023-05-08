@@ -1,21 +1,20 @@
 #!/bin/bash
 
-if [ "$#" -ne 1 ]; then
-  echo "Usage: $0 PORT_NUMBER"
+if [ "$#" -lt 1 ]; then
+  echo "Usage: $0 PORT_NUMBER [PORT_NUMBER ...]"
   exit 1
 fi
 
-PORT=$1
-PID=$(lsof -t -i:$PORT -sTCP:LISTEN)
+for PORT in "$@"
+do
+  PID=$(lsof -t -i:$PORT -sTCP:LISTEN)
 
-if [ -z "$PID" ]; then
-  echo "No process found listening on port $PORT"
-  exit 1
-fi
-
-echo "Killing process $PID listening on port $PORT"
-kill -9 $PID
-
-echo "Process killed successfully"
+  if [ -z "$PID" ]; then
+    echo "No process found listening on port $PORT"
+  else
+    echo "Killing process $PID listening on port $PORT"
+    kill -9 $PID
+  fi
+done
+echo "Processes killed done"
 exit 0
-
