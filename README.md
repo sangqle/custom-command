@@ -17,6 +17,11 @@ chmod +x <your script here>
 ```
 
 # Custom Commands
+## 1. killport
 ```bash
-kill-port <port>
+killport 3000 3001 3002
+```
+## 2. port
+```bash
+port 3000
 ```
