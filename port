@@ -1,0 +1,12 @@
+#!/bin/bash
+
+PORT=$1
+PID=$(lsof -t -i:$PORT)
+
+if [ -z "$PID" ]; then
+  echo "No process found listening on port $PORT"
+  exit 1
+fi
+
+echo "Process running on port $PORT has PID: $PID"
+ps -fp $PID
