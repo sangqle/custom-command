@@ -5,16 +5,35 @@ if [ "$#" -lt 1 ]; then
   exit 1
 fi
 
-for PORT in "$@"
+for ARG in "$@"
 do
-  PID=$(lsof -t -i:$PORT -sTCP:LISTEN)
+  if [[ "$ARG" =~ - ]]; then
+    START_PORT=$(echo "$ARG" | cut -d'-' -f1)
+    END_PORT=$(echo "$ARG" | cut -d'-' -f2)
 
-  if [ -z "$PID" ]; then
-    echo "No process found listening on port $PORT"
+    for ((PORT=START_PORT; PORT<=END_PORT; PORT++)); do
+      PID=$(lsof -t -i:$PORT -sTCP:LISTEN)
+
+      if [ -z "$PID" ]; then
+        echo "No process found listening on port $PORT"
+      else
+        echo "Killing process $PID listening on port $PORT"
+        kill -9 $PID
+      fi
+    done
   else
-    echo "Killing process $PID listening on port $PORT"
-    kill -9 $PID
+    PORT=$ARG
+    PID=$(lsof -t -i:$PORT -sTCP:LISTEN)
+
+    if [ -z "$PID" ]; then
+      echo "No process found listening on port $PORT"
+    else
+      echo "Killing process $PID listening on port $PORT"
+      kill -9 $PID
+    fi
   fi
 done
+
 echo "Processes killed done"
 exit 0
+
