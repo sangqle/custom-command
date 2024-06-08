@@ -15,14 +15,43 @@ if [ ! -d "$DRIVE_PATH" ]; then
   exit 1
 fi
 
-# Find all processes accessing the external drive
-PROCESS_IDS=$(lsof | grep "$DRIVE_PATH" | awk '{print $2}' | sort -u)
+# Function to show a loading animation
+show_loading() {
+  local -r pid="$1"
+  local -r delay='0.1'
+  local spinstr='|/-\'
+  while ps a | awk '{print $1}' | grep -q "$pid"; do
+    local temp=${spinstr#?}
+    printf " [%c]  " "$spinstr"
+    spinstr=$temp${spinstr%"$temp"}
+    sleep $delay
+    printf "\b\b\b\b\b\b"
+  done
+  printf "    \b\b\b\b"
+}
 
-# Kill each process
-for PID in $PROCESS_IDS; do
-  echo "Killing process $PID accessing $DRIVE_PATH"
+# Run lsof in the background and get its PID
+lsof_output=$(mktemp)
+lsof | grep "$DRIVE_PATH" > "$lsof_output" &
+lsof_pid=$!
+
+# Show loading animation while lsof is running
+show_loading $lsof_pid
+
+# Wait for lsof to complete
+wait $lsof_pid
+
+# Read the lsof output
+PROCESS_INFO=$(cat "$lsof_output")
+rm "$lsof_output"
+
+# Extract command name and PID from lsof output
+PROCESS_LIST=$(echo "$PROCESS_INFO" | awk '{print $1, $2}' | sort -u)
+
+# Kill each process and log the command name and PID
+echo "$PROCESS_LIST" | while read -r COMMAND PID; do
+  echo "Killing process $COMMAND with PID $PID accessing $DRIVE_PATH"
   kill -9 $PID
 done
 
 echo "All processes accessing $DRIVE_PATH have been killed."
-
