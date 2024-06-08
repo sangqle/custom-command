@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Get the current working directory
+cwd=$(pwd)
+
+# Copy the current working directory to the clipboard
+echo -n "$cwd" | xclip -selection clipboard
+
+# Optionally, print a message indicating that the path has been copied
+echo "Current directory copied to clipboard: $cwd"
