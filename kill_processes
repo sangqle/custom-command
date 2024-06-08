@@ -15,19 +15,18 @@ if [ ! -d "$DRIVE_PATH" ]; then
   exit 1
 fi
 
-# Function to show a loading animation
+# Function to show a loading bar
 show_loading() {
   local -r pid="$1"
-  local -r delay='0.1'
+  local -r delay='0.2'
   local spinstr='|/-\'
-  while ps a | awk '{print $1}' | grep -q "$pid"; do
-    local temp=${spinstr#?}
-    printf " [%c]  " "$spinstr"
-    spinstr=$temp${spinstr%"$temp"}
-    sleep $delay
-    printf "\b\b\b\b\b\b"
+  local i=0
+  while ps -p "$pid" > /dev/null 2>&1; do
+    i=$(( (i+1) %4 ))
+    printf "\r[%s] Loading list process to kill ... " "${spinstr:$i:1}"
+    sleep "$delay"
   done
-  printf "    \b\b\b\b"
+  printf "\r[✓] Done.         \n"
 }
 
 # Run lsof in the background and get its PID
@@ -35,7 +34,7 @@ lsof_output=$(mktemp)
 lsof | grep "$DRIVE_PATH" > "$lsof_output" &
 lsof_pid=$!
 
-# Show loading animation while lsof is running
+# Show loading bar while lsof is running
 show_loading $lsof_pid
 
 # Wait for lsof to complete
