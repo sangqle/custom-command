@@ -1,0 +1,24 @@
+#!/bin/bash    
+
+# Lấy đường dẫn hiện tại
+current_path=$(pwd)
+
+last_dir=$(basename "$current_path")
+# Số dòng, mặc định là 100 nếu không có tham số
+lines=${2:-100}
+# Xác định loại log: "error" hoặc "normal"
+log_type=${1:-normal}
+
+if [[ "$log_type" == "error" ]]; then
+    log_file="/data/log/${last_dir}/${last_dir}_error.log"
+else
+    log_file="/data/log/${last_dir}/${last_dir}.log"
+fi
+
+# Kiểm tra xem file log có tồn tại không
+if [ -f "$log_file" ]; then
+    echo "Tailing $log_file with last $lines lines..."
+    tail -f -n "$lines" "$log_file"
+else
+    echo "Log file not found: $log_file"
+fi
